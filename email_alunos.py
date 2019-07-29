@@ -1,0 +1,80 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[257]:
+
+
+import pandas as pd
+import smtplib
+from email.message import EmailMessage
+from email.mime.text import MIMEText
+import re
+
+
+# In[258]:
+
+
+s = smtplib.SMTP('smtp.gmail.com', 587)
+s.starttls()
+s.login('xandao.labs@gmail.com', 'xand3d3v')
+
+
+# In[265]:
+
+
+alunos = pd.read_excel("alunos.xlsx")
+alunos = alunos.sort_values('MÉDIA', ascending = False)
+alunos['Classificação'] = list(range(1, 128))
+alunos.index = alunos.Classificação
+
+
+# In[266]:
+
+
+tabela = alunos.dropna(axis=1, how="all")
+tabela = tabela.drop(["EMAIL", "NOME", "POSTO/QUADRO", "ANT"], axis=1)
+
+
+# In[261]:
+
+
+for i in alunos["Classificação"]:
+    msg = EmailMessage()
+    msg['Subject'] = 'Atualização de notas e classificação'
+    msg['From'] = "xandao.labs@gmail.com"
+    msg['To'] = [alunos["EMAIL"][i].lower()]
+    texto = 'Fala, {0}!'.format(alunos["NOME DE GUERRA"][i])
+
+    HTML = """<html>
+               <head></head>
+               <body>
+               <h3>Aqui vão as estatísticas da última rodada!</h3>"""
+
+    tabela = tabela[tabela.index==i].to_html()
+    tabela = re.sub(r"<th>Classificação</th", "", tabela)
+    tabela = re.sub(r"<th>NOME DE GUERRA</th>", "<th>Classificação</th><th>NOME DE GUERRA</th>", tabela)
+    tabela = re.sub(r"<th></th>", "", tabela)
+    tabela = re.sub(r"<td", "<td style='text-align: center;'", tabela)
+    tabela = re.sub(r"\n", "", tabela)
+    tabela = re.sub(r"      >    </tr>    <tr>      >                                                                </tr>  ", "", tabela)
+    tabela = re.sub(r"<td style=\'text-align: center;\'>{0}</td>".format(i), "", tabela)
+    HTML += tabela
+
+    HTML += """<p>Em caso de dúvidas sobre notas, procurar o <b>Departamento de Ensino</b>.
+               <br> TAF ainda não entrou na classificação.
+               <br> Para utilizar no excel, basta copiar e colar a tabela acima.</p>
+               <p>1T(IM) Alexandre
+               <p> Código fonte em www.github.com/im-alexandre</p>
+             </body></html>"""
+
+    part1 = MIMEText(texto,'plain')
+    part2 = MIMEText(HTML, 'html')
+
+    msg.set_content(part1)
+    msg.set_content(part2)
+
+    try:
+        s.sendmail(msg['From'], msg['To'], msg.as_string())
+    except:
+        print(alunos['NOME DE GUERRA'][i] + "Não recebeu o email")
+
