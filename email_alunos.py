@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[257]:
+# In[1]:
 
 
 import pandas as pd
@@ -11,7 +11,7 @@ from email.mime.text import MIMEText
 import re
 
 
-# In[258]:
+# In[2]:
 
 
 s = smtplib.SMTP('smtp.gmail.com', 587)
@@ -19,7 +19,7 @@ s.starttls()
 s.login('xandao.labs@gmail.com', 'xand3d3v')
 
 
-# In[265]:
+# In[3]:
 
 
 alunos = pd.read_excel("alunos.xlsx")
@@ -28,14 +28,15 @@ alunos['Classificação'] = list(range(1, 128))
 alunos.index = alunos.Classificação
 
 
-# In[266]:
+# In[4]:
 
 
 tabela = alunos.dropna(axis=1, how="all")
 tabela = tabela.drop(["EMAIL", "NOME", "POSTO/QUADRO", "ANT"], axis=1)
+tabela.index = tabela["Classificação"]
 
 
-# In[261]:
+# In[5]:
 
 
 for i in alunos["Classificação"]:
@@ -50,15 +51,16 @@ for i in alunos["Classificação"]:
                <body>
                <h3>Aqui vão as estatísticas da última rodada!</h3>"""
 
-    tabela = tabela[tabela.index==i].to_html()
-    tabela = re.sub(r"<th>Classificação</th", "", tabela)
-    tabela = re.sub(r"<th>NOME DE GUERRA</th>", "<th>Classificação</th><th>NOME DE GUERRA</th>", tabela)
-    tabela = re.sub(r"<th></th>", "", tabela)
-    tabela = re.sub(r"<td", "<td style='text-align: center;'", tabela)
-    tabela = re.sub(r"\n", "", tabela)
-    tabela = re.sub(r"      >    </tr>    <tr>      >                                                                </tr>  ", "", tabela)
-    tabela = re.sub(r"<td style=\'text-align: center;\'>{0}</td>".format(i), "", tabela)
-    HTML += tabela
+    tabela_aluno = tabela[tabela.index == i].to_html()
+
+    tabela_aluno = re.sub(r"<th>Classificação</th", "", tabela_aluno)
+    tabela_aluno = re.sub(r"<th>NOME DE GUERRA</th>", "<th>Classificação</th><th>NOME DE GUERRA</th>", tabela_aluno)
+    tabela_aluno = re.sub(r"<th></th>", "", tabela_aluno)
+    tabela_aluno = re.sub(r"<td", "<td style='text-align: center;'", tabela_aluno)
+    tabela_aluno = re.sub(r"\n", "", tabela_aluno)
+    tabela_aluno = re.sub(r"      >    </tr>    <tr>      >                                                                </tr>  ", "", tabela_aluno)
+    tabela_aluno = re.sub(r"<td style=\'text-align: center;\'>{0}</td>".format(i), "", tabela_aluno)
+    HTML += tabela_aluno
 
     HTML += """<p>Em caso de dúvidas sobre notas, procurar o <b>Departamento de Ensino</b>.
                <br> TAF ainda não entrou na classificação.
@@ -77,4 +79,11 @@ for i in alunos["Classificação"]:
         s.sendmail(msg['From'], msg['To'], msg.as_string())
     except:
         print(alunos['NOME DE GUERRA'][i] + "Não recebeu o email")
+        s.close()
+
+
+# In[ ]:
+
+
+
 
