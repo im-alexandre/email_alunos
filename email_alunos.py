@@ -32,7 +32,7 @@ alunos.index = alunos.Classificação
 
 
 tabela = alunos.dropna(axis=1, how="all")
-tabela = tabela.drop(["EMAIL", "NOME", "POSTO/QUADRO", "ANT"], axis=1)
+tabela = tabela.drop(["index", "EMAIL", "NOME", "POSTO/QUADRO", "ANT"], axis=1)
 tabela.index = tabela["Classificação"]
 
 
@@ -46,10 +46,12 @@ for i in alunos["Classificação"]:
     msg['To'] = [alunos["EMAIL"][i].lower()]
     texto = 'Fala, {0}!'.format(alunos["NOME DE GUERRA"][i])
 
-    HTML = """<html>
-               <head></head>
-               <body>
-               <h3>Aqui vão as estatísticas da última rodada!</h3>"""
+    HTML = """  <html>
+                    <head>
+                        <meta charset="utf-8">
+                    </head>
+                    <body>
+                        <h3>Aqui vão as estatísticas da última rodada!</h3>"""
 
     tabela_aluno = tabela[tabela.index == i].to_html()
 
@@ -62,12 +64,16 @@ for i in alunos["Classificação"]:
     tabela_aluno = re.sub(r"<td style=\'text-align: center;\'>{0}</td>".format(i), "", tabela_aluno)
     HTML += tabela_aluno
 
-    HTML += """<p>Em caso de dúvidas sobre notas, procurar o <b>Departamento de Ensino</b>.
-               <br> TAF ainda não entrou na classificação.
-               <br> Para utilizar no excel, basta copiar e colar a tabela acima.</p>
-               <p>1T(IM) Alexandre
-               <p> Código fonte em www.github.com/im-alexandre</p>
-             </body></html>"""
+    HTML += """ <h3><b>Observações:</b></h3>
+                <ul>
+                    <li>Em caso de dúvidas sobre notas, procurar o <b>Departamento de Ensino.</b></li>
+                    <li> TAF ainda não entrou na classificação.</li>
+                    <li> Para utilizar no excel, basta copiar e colar a tabela acima.</li>
+                </ul>
+                <h4>1T(IM) Alexandre</h4>
+                <p> <b>Acesse o código fonte em:</b> www.github.com/im-alexandre</p>
+            </body>
+            </html>"""
 
     part1 = MIMEText(texto,'plain')
     part2 = MIMEText(HTML, 'html')
@@ -80,10 +86,3 @@ for i in alunos["Classificação"]:
     except:
         print(alunos['NOME DE GUERRA'][i] + "Não recebeu o email")
         s.close()
-
-
-# In[ ]:
-
-
-
-
