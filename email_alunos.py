@@ -16,7 +16,7 @@ import re
 
 s = smtplib.SMTP('smtp.gmail.com', 587)
 s.starttls()
-s.login('xandao.labs@gmail.com', 'xand3d3v')
+s.login('email', 'senha')
 
 
 # In[3]:
