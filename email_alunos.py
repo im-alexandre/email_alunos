@@ -1,36 +1,27 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-#Importação dos módulos necessários
 import pandas as pd
 import smtplib
 from email.message import EmailMessage
 from email.mime.text import MIMEText
 import re
 
-# Conexão com o servidor smtp do google (outros provedores também possuem servidor) 
 s = smtplib.SMTP('smtp.gmail.com', 587)
 s.starttls()
 s.login('email', 'senha')
 
-# Importação da tabela com os dados dos alunos
 alunos = pd.read_excel("alunos.xlsx")
-# Ordena pela média decrescente
 alunos = alunos.sort_values('MÉDIA', ascending = False)
-#Atribui a clasificação de 1 até o comprimento da tabela
 alunos['Classificação'] = list(range(1, alunos.shape[0]))
-# Indexa a tabela pela classificação
 alunos.index = alunos.Classificação
 
-# Gera uma segunda tabela somente com os dados que serão encaminhados aos alunos
 tabela = alunos.dropna(axis=1, how="all")
 tabela = tabela.drop(["index", "EMAIL", "NOME", "POSTO/QUADRO", "ANT"], axis=1)
 
-#indexa a tabela de notas pela classificação (Para poder "cruzar" com a tabela de dados dos alunos)
 tabela.index = tabela["Classificação"]
 
 
-# Loop que percorre o índice de classificação e envia os e-mails
 for i in alunos["Classificação"]:
     #cria uma mensagem com os atributos: assunto e origem
     msg = EmailMessage()
