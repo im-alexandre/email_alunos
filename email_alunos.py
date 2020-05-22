@@ -23,11 +23,14 @@ tabela.index = tabela["Classificação"]
 
 
 for i in alunos["Classificação"]:
+    #cria uma mensagem com os atributos: assunto e origem
     msg = EmailMessage()
     msg['Subject'] = 'Atualização de notas e classificação'
     msg['From'] = "xandao.labs@gmail.com"
+    # pega o email da primeira tabela com base na clasificação (variável "i")
     msg['To'] = [alunos["EMAIL"][i].lower()]
     
+    # Cria o corpo do e-mail
     texto = 'Fala, {0}!'.format(alunos["NOME DE GUERRA"][i])
     
     # Gera um html para anexar ao corpo do e-mail (pode ser que alguns alunos recebam um e-mail binário
